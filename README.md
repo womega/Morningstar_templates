@@ -15,7 +15,6 @@ The repository contains the following files:
 ## Prerequisites
 
 - Python 3.10.12 or higher
-- PyTorch installed (pip install torch)
 - Virtual environment setup (recommended)
 
 ## Running the Code
