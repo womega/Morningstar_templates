@@ -16,8 +16,8 @@ elif torch.backends.mps.is_available():
 
 print(f"Using device: {device}")
 
-# Create 'model_checkpoints' directory if it doesn't exist
-checkpoint_dir = "model_checkpoints"
+# Create 'mnist_model_checkpoints' directory if it doesn't exist
+checkpoint_dir = "mnist_model_checkpoints"
 if not os.path.exists(checkpoint_dir):
     os.makedirs(checkpoint_dir)
     print(f"Created '{checkpoint_dir}' directory.")
