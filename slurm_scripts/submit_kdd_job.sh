@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --account=research
-#SBATCH --gpus=ampere:1
+#SBATCH --account=small
+#SBATCH --partition=small
 #SBATCH --time=04:00:00
-#SBATCH -o $HOME/Morningstar_templates/slurm_scripts/out/kdd_output.out
-#SBATCH -e $HOME/Morningstar_templates/slurm_scripts/err/kdd_error.err
+#SBATCH --output=/home/uottawa.o.univ/%u/Morningstar_templates/slurm_scripts/out/kdd_output-%j.out
+#SBATCH --error=/home/uottawa.o.univ/%u/Morningstar_templates/slurm_scripts/out/kdd_error-%j.err
 
 # Activate the virtual environment
 cd $HOME/
