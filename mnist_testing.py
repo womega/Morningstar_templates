@@ -49,7 +49,9 @@ model.eval()
 transform = transforms.Compose(
     [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
 )
-testset = datasets.MNIST(root="./data", train=False, download=True, transform=transform)
+testset = datasets.MNIST(
+    root="./data", train=False, download=False, transform=transform
+)
 testloader = DataLoader(testset, batch_size=64, shuffle=False)
 
 # Start the timer for testing

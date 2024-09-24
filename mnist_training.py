@@ -71,7 +71,7 @@ else:
         [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
     )
     trainset = datasets.MNIST(
-        root="./data", train=True, download=True, transform=transform
+        root="./data", train=True, download=False, transform=transform
     )
     trainloader = DataLoader(trainset, batch_size=64, shuffle=True)
 

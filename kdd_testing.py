@@ -1,3 +1,4 @@
+import tensorflow as tf
 from tensorflow.keras import models
 import os
 import pandas as pd
@@ -5,6 +6,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix
+
+# Check available devices
+gpus = tf.config.list_physical_devices("GPU")
+if gpus:
+    device_name = "GPU"
+else:
+    device_name = "CPU"
+
+print(f"Using device: {device_name}")
 
 print("Loading the NSL-KDD dataset...")
 

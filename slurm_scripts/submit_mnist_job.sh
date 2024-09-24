@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --account=small
 #SBATCH --partition=small
+#SBATCH --gres=gpu:1
 #SBATCH --time=02:00:00
 #SBATCH --output=/home/uottawa.o.univ/%u/Morningstar_templates/slurm_scripts/out/mnist_output-%j.out
 #SBATCH --error=/home/uottawa.o.univ/%u/Morningstar_templates/slurm_scripts/err/mnist_error-%j.err
@@ -15,4 +16,4 @@ cd $HOME/Morningstar_templates/
 python mnist_training.py
 
 # Run the Python testing script
-python mnist_test_model.py
+python mnist_testing.py

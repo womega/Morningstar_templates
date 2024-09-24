@@ -7,13 +7,22 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
+# Check available devices
+gpus = tf.config.list_physical_devices("GPU")
+if gpus:
+    device_name = "GPU"
+else:
+    device_name = "CPU"
+
+print(f"Using device: {device_name}")
+
 # Create 'kdd_model_checkpoints' directory if it doesn't exist
 checkpoint_dir = "kdd_model_checkpoints"
 if not os.path.exists(checkpoint_dir):
     os.makedirs(checkpoint_dir)
     print(f"Created '{checkpoint_dir}' directory.")
 
-checkpoint_path = checkpoint_dir + "/model_epoch_{epoch:02d}.hdf5"
+checkpoint_path = checkpoint_dir + "/model_epoch_{epoch:02d}.keras"
 
 checkpoint = ModelCheckpoint(
     filepath=checkpoint_path,
