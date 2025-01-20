@@ -5,7 +5,10 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import time
 import os
+from utils import extract_number, set_seed
+import argparse
 
+set_seed()
 # Check if GPU is available
 device = torch.device("cpu")
 if torch.cuda.is_available():
@@ -13,6 +16,21 @@ if torch.cuda.is_available():
 elif torch.backends.mps.is_available():
     device = torch.device("mps")
 
+parser = argparse.ArgumentParser(
+        "Training configuration for MNIST dataset."
+    )
+
+parser.add_argument(
+        "--n_epochs",
+        type=int,
+        default=10,
+        help="Number of epochs for training model",
+    )
+
+args = parser.parse_args()
+
+# Total number of epochs for training
+n_epochs = args.n_epochs
 
 print(f"Using device: {device}")
 
@@ -44,26 +62,24 @@ model = Net().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
-# Total number of epochs for training
-epochs = 5
-
 # Load checkpoint if available
 start_epoch = 0
 checkpoint_files = sorted(
-    [f for f in os.listdir(checkpoint_dir) if not f.endswith("final.pth")]
+    [f for f in os.listdir(checkpoint_dir) if not f.startswith('.')], key=extract_number
 )
 if checkpoint_files:
     latest_checkpoint = os.path.join(checkpoint_dir, checkpoint_files[-1])
     print(f"Resuming from checkpoint: {latest_checkpoint}")
-    checkpoint = torch.load(latest_checkpoint)
+    checkpoint = torch.load(latest_checkpoint,weights_only=True)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     start_epoch = checkpoint["epoch"] + 1
 
+set_seed()
 # Check if training is already complete
-if start_epoch >= epochs:
+if start_epoch >= n_epochs:
     print(
-        f"Training is already complete for {epochs} epochs. No further training required."
+        f"Training is already complete for {n_epochs} epochs. No further training required."
     )
 else:
     # Set up data transformations and loaders
@@ -79,8 +95,8 @@ else:
     total_start_time = time.time()
 
     # Train the model
-
-    for epoch in range(start_epoch, epochs):
+    set_seed()
+    for epoch in range(start_epoch, n_epochs):
         epoch_start_time = time.time()
         running_loss = 0.0
         for images, labels in trainloader:
@@ -122,7 +138,3 @@ else:
     if device.type == "cuda":
         print(f"GPU used: {torch.cuda.get_device_name(0)}")
 
-    # Save the final model in the checkpoints directory
-    final_model_path = os.path.join(checkpoint_dir, "mnist_model_final.pth")
-    torch.save(model.state_dict(), final_model_path)
-    print(f"Final model saved: {final_model_path}")

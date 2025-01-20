@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix
+from utils import extract_number, set_seed
 
 # Check available devices
 gpus = tf.config.list_physical_devices("GPU")
@@ -100,7 +101,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Load the latest checkpoint if available
-checkpoint_files = sorted(os.listdir(checkpoint_dir))
+checkpoint_files = sorted(
+    [f for f in os.listdir(checkpoint_dir) if not f.startswith('.')], key=extract_number
+)
 final_epoch = 0
 
 if checkpoint_files:
@@ -112,7 +115,7 @@ else:
     raise FileNotFoundError("No checkpoints found. Consider training the model first.")
 
 print("Evaluating the model...")
-
+set_seed()
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f"Accuracy: {accuracy*100:.2f}%")

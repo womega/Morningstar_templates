@@ -6,6 +6,26 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+from utils import extract_number, set_seed
+import argparse
+
+parser = argparse.ArgumentParser(
+        "Training configuration for MNIST dataset."
+    )
+
+parser.add_argument(
+        "--n_epochs",
+        type=int,
+        default=10,
+        help="Number of epochs for training model",
+    )
+
+args = parser.parse_args()
+
+set_seed()
+
+# Total number of epochs for training
+n_epochs = args.n_epochs
 
 # Check available devices
 gpus = tf.config.list_physical_devices("GPU")
@@ -122,7 +142,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # Define hyperparameters
 input_shape = X_train.shape[1]
-epochs = 10
+
 batch_size = 32
 learning_rate = 0.001
 
@@ -141,6 +161,7 @@ model = models.Sequential(
 
 print("Compiling the model...")
 
+set_seed()
 # Compile the model
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
@@ -149,7 +170,9 @@ model.compile(
 )
 
 # Load the latest checkpoint if available
-checkpoint_files = sorted(os.listdir(checkpoint_dir))
+checkpoint_files = sorted(
+    [f for f in os.listdir(checkpoint_dir) if not f.startswith('.')], key=extract_number
+)
 initial_epoch = 0
 
 if checkpoint_files:
@@ -164,12 +187,12 @@ else:
 
 print("Training the model...")
 
-
+set_seed()
 # Train the model
 model.fit(
     X_train,
     y_train,
-    epochs=epochs,
+    epochs=n_epochs,
     batch_size=batch_size,
     validation_data=(X_test, y_test),
     callbacks=[PrintEpochStats(), checkpoint],

@@ -5,7 +5,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import time
 import os
-
+from utils import extract_number, set_seed
 
 # Define the neural network model (same as in the training script)
 class Net(nn.Module):
@@ -35,23 +35,28 @@ print(f"Using device: {device}")
 
 # Load the final model from the checkpoints directory
 checkpoint_dir = "mnist_model_checkpoints"
-final_model_path = os.path.join(checkpoint_dir, "mnist_model_final.pth")
-if os.path.exists(final_model_path):
-    print(f"Loading final model from: {final_model_path}")
-    model = Net().to(device)
-    model.load_state_dict(torch.load(final_model_path))
-else:
-    raise FileNotFoundError(f"Final model not found in: {final_model_path}")
 
+checkpoint_files = sorted(
+    [f for f in os.listdir(checkpoint_dir) if not f.startswith('.')], key=extract_number
+)
+if checkpoint_files:
+    latest_checkpoint = os.path.join(checkpoint_dir, checkpoint_files[-1])
+    final_epoch = int(latest_checkpoint.split("_")[-1].split(".")[0])
+    print(f"Loading the final model from epoch: {final_epoch}...")
+    model = Net().to(device)
+    model.load_state_dict(torch.load(latest_checkpoint, weights_only=True)["model_state_dict"])
+else:
+    raise FileNotFoundError("No checkpoints found. Consider training the model first.")
+
+
+set_seed()
 model.eval()
 
 # Set up data transformations and loaders for the test set
 transform = transforms.Compose(
     [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
 )
-testset = datasets.MNIST(
-    root="./data", train=False, download=False, transform=transform
-)
+testset = datasets.MNIST(root="./data", train=False, download=False, transform=transform)
 testloader = DataLoader(testset, batch_size=64, shuffle=False)
 
 # Start the timer for testing
